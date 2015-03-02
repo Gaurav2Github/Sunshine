@@ -21,9 +21,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.materialapp.gauravtandon.sunshine.app.data.WeatherDbHelper;
-import com.materialapp.gauravtandon.sunshine.app.data.WeatherContract.WeatherEntry;
 import com.materialapp.gauravtandon.sunshine.app.data.WeatherContract.LocationEntry;
+import com.materialapp.gauravtandon.sunshine.app.data.WeatherContract.WeatherEntry;
+import com.materialapp.gauravtandon.sunshine.app.data.WeatherDbHelper;
+
+import java.util.Map;
+import java.util.Set;
 
 public class TestDb extends AndroidTestCase {
 
@@ -53,13 +56,14 @@ public class TestDb extends AndroidTestCase {
         WeatherDbHelper dbHelper = new WeatherDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        // Create a new map of values, where column names are the keys
-        ContentValues values = new ContentValues();
-        values.put(LocationEntry.COLUMN_LOCATION_SETTING, testLocationSetting);
-        values.put(LocationEntry.COLUMN_CITY_NAME, testCityName);
-        values.put(LocationEntry.COLUMN_COORD_LAT, testLatitude);
-        values.put(LocationEntry.COLUMN_COORD_LONG, testLongitude);
-
+        ContentValues values = createNorthPoleLocationValues();
+//        // Create a new map of values, where column names are the keys
+//        ContentValues values = new ContentValues();
+//        values.put(LocationEntry.COLUMN_LOCATION_SETTING, testLocationSetting);
+//        values.put(LocationEntry.COLUMN_CITY_NAME, testCityName);
+//        values.put(LocationEntry.COLUMN_COORD_LAT, testLatitude);
+//        values.put(LocationEntry.COLUMN_COORD_LONG, testLongitude);
+//
         long locationRowId;
         locationRowId = db.insert(LocationEntry.TABLE_NAME, null, values);
 
@@ -92,26 +96,29 @@ public class TestDb extends AndroidTestCase {
 
         // If possible, move to the first row of the query results.
         if (cursor.moveToFirst()) {
-            // Get the value in each column by finding the appropriate column index.
-            int locationIndex = cursor.getColumnIndex(LocationEntry.COLUMN_LOCATION_SETTING);
-            String location = cursor.getString(locationIndex);
 
-            int nameIndex = cursor.getColumnIndex((LocationEntry.COLUMN_CITY_NAME));
-            String name = cursor.getString(nameIndex);
 
-            int latIndex = cursor.getColumnIndex((LocationEntry.COLUMN_COORD_LAT));
-            double latitude = cursor.getDouble(latIndex);
-
-            int longIndex = cursor.getColumnIndex((LocationEntry.COLUMN_COORD_LONG));
-            double longitude = cursor.getDouble(longIndex);
-
-            // Hooray, data was returned!  Assert that it's the right data, and that the database
-            // creation code is working as intended.
-            // Then take a break.  We both know that wasn't easy.
-            assertEquals(testCityName, name);
-            assertEquals(testLocationSetting, location);
-            assertEquals(testLatitude, latitude);
-            assertEquals(testLongitude, longitude);
+            validateCursor(cursor, values);
+//            // Get the value in each column by finding the appropriate column index.
+//            int locationIndex = cursor.getColumnIndex(LocationEntry.COLUMN_LOCATION_SETTING);
+//            String location = cursor.getString(locationIndex);
+//
+//            int nameIndex = cursor.getColumnIndex((LocationEntry.COLUMN_CITY_NAME));
+//            String name = cursor.getString(nameIndex);
+//
+//            int latIndex = cursor.getColumnIndex((LocationEntry.COLUMN_COORD_LAT));
+//            double latitude = cursor.getDouble(latIndex);
+//
+//            int longIndex = cursor.getColumnIndex((LocationEntry.COLUMN_COORD_LONG));
+//            double longitude = cursor.getDouble(longIndex);
+//
+//            // Hooray, data was returned!  Assert that it's the right data, and that the database
+//            // creation code is working as intended.
+//            // Then take a break.  We both know that wasn't easy.
+//            assertEquals(testCityName, name);
+//            assertEquals(testLocationSetting, location);
+//            assertEquals(testLatitude, latitude);
+//            assertEquals(testLongitude, longitude);
 
             // Fantastic.  Now that we have a location, add some weather!
         } else {
@@ -119,29 +126,31 @@ public class TestDb extends AndroidTestCase {
             fail("No values returned :(");
         }
 
-        long weatherId = 321;
-        double windSpeed = 5.5;
-        String shortDesc = "Asteroids";
-        long minTemp = 65;
-        long maxTemp = 75;
-        double pressure = 1.3;
-        double humidity = 1.2;
-        double degrees = 1.1;
-        String dateText = "20141205";
 
-
-        // Fantastic.  Now that we have a location, add some weather!
-        ContentValues weatherValues = new ContentValues();
-        weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationRowId);
-        weatherValues.put(WeatherEntry.COLUMN_DATETEXT, dateText);
-        weatherValues.put(WeatherEntry.COLUMN_DEGREES, degrees);
-        weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, humidity);
-        weatherValues.put(WeatherEntry.COLUMN_PRESSURE, pressure);
-        weatherValues.put(WeatherEntry.COLUMN_MAX_TEMP, maxTemp);
-        weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, minTemp);
-        weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, shortDesc);
-        weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, windSpeed);
-        weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weatherId);
+        ContentValues weatherValues = createWeatherValues(locationRowId);
+//        long weatherId = 321;
+//        double windSpeed = 5.5;
+//        String shortDesc = "Asteroids";
+//        long minTemp = 65;
+//        long maxTemp = 75;
+//        double pressure = 1.3;
+//        double humidity = 1.2;
+//        double degrees = 1.1;
+//        String dateText = "20141205";
+//
+//
+//        // Fantastic.  Now that we have a location, add some weather!
+//        ContentValues weatherValues = new ContentValues();
+//        weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationRowId);
+//        weatherValues.put(WeatherEntry.COLUMN_DATETEXT, dateText);
+//        weatherValues.put(WeatherEntry.COLUMN_DEGREES, degrees);
+//        weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, humidity);
+//        weatherValues.put(WeatherEntry.COLUMN_PRESSURE, pressure);
+//        weatherValues.put(WeatherEntry.COLUMN_MAX_TEMP, maxTemp);
+//        weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, minTemp);
+//        weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, shortDesc);
+//        weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, windSpeed);
+//        weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weatherId);
         //*/
 
         /**
@@ -188,52 +197,55 @@ public class TestDb extends AndroidTestCase {
 
         // If possible, move to the first row of the query results.
         if (weatherCursor.moveToFirst()) {
+
+
+            validateCursor(weatherCursor,weatherValues);
             // Get the value in each column by finding the appropriate column index.
 
-            int weatherlocKeyIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_LOC_KEY);
-            long weatherlocKey = weatherCursor.getLong(weatherlocKeyIndex);
-
-            int weatherDateTextIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_DATETEXT);
-            String weatherDateText = weatherCursor.getString(weatherDateTextIndex);
-
-            int weatherShortDescIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC);
-            String weatherShortDesc = weatherCursor.getString(weatherShortDescIndex);
-
-            int weatherIdIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID);
-            long weatherColId = weatherCursor.getLong(weatherIdIndex);
-
-            int weatherMinTempIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP);
-            double weatherMinTemp = weatherCursor.getDouble(weatherMinTempIndex);
-
-            int weatherMaxTempIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP);
-            double weatherMaxTemp = weatherCursor.getDouble(weatherMaxTempIndex);
-
-            int weatherHumidityIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_HUMIDITY);
-            double weatherHumidity = weatherCursor.getDouble(weatherHumidityIndex);
-
-            int weatherPressureIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_PRESSURE);
-            double weatherPressure = weatherCursor.getDouble(weatherPressureIndex);
-
-            int weatherWindSpeedIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_WIND_SPEED);
-            double weatherWindSpeed = weatherCursor.getDouble(weatherWindSpeedIndex);
-
-            int weatherDegreesIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_DEGREES);
-            double weatherDegrees = weatherCursor.getDouble(weatherDegreesIndex);
-
-
-            // Hooray, data was returned!  Assert that it's the right data, and that the database
-            // creation code is working as intended.
-            // Then take a break.  We both know that wasn't easy.
-            assertEquals(locationRowId, weatherlocKey);
-            assertEquals(weatherValues.get(WeatherEntry.COLUMN_DATETEXT), weatherDateText);
-            assertEquals(weatherValues.get(WeatherEntry.COLUMN_SHORT_DESC), weatherShortDesc);
-            assertEquals(weatherValues.get(WeatherEntry.COLUMN_WEATHER_ID), weatherColId);
-            assertEquals(weatherValues.get(WeatherEntry.COLUMN_MIN_TEMP), weatherMinTemp);
-            assertEquals(weatherValues.get(WeatherEntry.COLUMN_MAX_TEMP), weatherMaxTemp);
-            assertEquals(weatherValues.get(WeatherEntry.COLUMN_HUMIDITY), weatherHumidity);
-            assertEquals(weatherValues.get(WeatherEntry.COLUMN_PRESSURE), weatherPressure);
-            assertEquals(weatherValues.get(WeatherEntry.COLUMN_WIND_SPEED), weatherWindSpeed);
-            assertEquals(weatherValues.get(WeatherEntry.COLUMN_DEGREES), weatherDegrees);
+//            int weatherlocKeyIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_LOC_KEY);
+//            long weatherlocKey = weatherCursor.getLong(weatherlocKeyIndex);
+//
+//            int weatherDateTextIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_DATETEXT);
+//            String weatherDateText = weatherCursor.getString(weatherDateTextIndex);
+//
+//            int weatherShortDescIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC);
+//            String weatherShortDesc = weatherCursor.getString(weatherShortDescIndex);
+//
+//            int weatherIdIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID);
+//            long weatherColId = weatherCursor.getLong(weatherIdIndex);
+//
+//            int weatherMinTempIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP);
+//            long weatherMinTemp = weatherCursor.getLong(weatherMinTempIndex);
+//
+//            int weatherMaxTempIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_MAX_TEMP);
+//            long weatherMaxTemp = weatherCursor.getLong(weatherMaxTempIndex);
+//
+//            int weatherHumidityIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_HUMIDITY);
+//            double weatherHumidity = weatherCursor.getDouble(weatherHumidityIndex);
+//
+//            int weatherPressureIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_PRESSURE);
+//            double weatherPressure = weatherCursor.getDouble(weatherPressureIndex);
+//
+//            int weatherWindSpeedIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_WIND_SPEED);
+//            double weatherWindSpeed = weatherCursor.getDouble(weatherWindSpeedIndex);
+//
+//            int weatherDegreesIndex = weatherCursor.getColumnIndex(WeatherEntry.COLUMN_DEGREES);
+//            double weatherDegrees = weatherCursor.getDouble(weatherDegreesIndex);
+//
+//
+//            // Hooray, data was returned!  Assert that it's the right data, and that the database
+//            // creation code is working as intended.
+//            // Then take a break.  We both know that wasn't easy.
+//            assertEquals(locationRowId, weatherlocKey);
+//            assertEquals(weatherValues.get(WeatherEntry.COLUMN_DATETEXT), weatherDateText);
+//            assertEquals(weatherValues.get(WeatherEntry.COLUMN_SHORT_DESC), weatherShortDesc);
+//            assertEquals(weatherValues.get(WeatherEntry.COLUMN_WEATHER_ID), weatherColId);
+//            assertEquals(weatherValues.get(WeatherEntry.COLUMN_MIN_TEMP), weatherMinTemp);
+//            assertEquals(weatherValues.get(WeatherEntry.COLUMN_MAX_TEMP), weatherMaxTemp);
+//            assertEquals(weatherValues.get(WeatherEntry.COLUMN_HUMIDITY), weatherHumidity);
+//            assertEquals(weatherValues.get(WeatherEntry.COLUMN_PRESSURE), weatherPressure);
+//            assertEquals(weatherValues.get(WeatherEntry.COLUMN_WIND_SPEED), weatherWindSpeed);
+//            assertEquals(weatherValues.get(WeatherEntry.COLUMN_DEGREES), weatherDegrees);
 
 
             // Fantastic.  Now that we have a location, add some weather!
@@ -256,6 +268,7 @@ public class TestDb extends AndroidTestCase {
     /* TODO Uncomment for
     4a - Simplify Tests
     https://www.udacity.com/course/viewer#!/c-ud853/l-1639338560/e-1633698607/m-1615128666
+    */
     static ContentValues createWeatherValues(long locationRowId) {
         ContentValues weatherValues = new ContentValues();
         weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationRowId);
@@ -300,5 +313,5 @@ public class TestDb extends AndroidTestCase {
 
     static final String TEST_LOCATION = "99705";
     static final String TEST_DATE = "20141205";
-    */
+    //*/
 }
